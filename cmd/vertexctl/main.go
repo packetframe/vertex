@@ -29,7 +29,8 @@ func init() {
 	cobra.OnInitialize(func() {
 		server = os.Getenv("VERTEX_SERVER")
 		if server == "" {
-			log.Fatal("VERTEX_SERVER must be defined")
+			log.Warn("VERTEX_SERVER environment variable not set, setting to http://localhost:8080")
+			server = "http://localhost:8080"
 		}
 		if verbose {
 			log.SetLevel(log.DebugLevel)

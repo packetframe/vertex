@@ -1,6 +1,6 @@
-# xdpborder
+# vertex
 
-XDP based border firewall
+XDP based edge firewall
 
 ## Example Filters
 

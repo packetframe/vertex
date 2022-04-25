@@ -27,9 +27,9 @@ var server string
 
 func init() {
 	cobra.OnInitialize(func() {
-		server = os.Getenv("BORDER_SERVER")
+		server = os.Getenv("VERTEX_SERVER")
 		if server == "" {
-			log.Fatal("BORDER_SERVER must be defined")
+			log.Fatal("VERTEX_SERVER must be defined")
 		}
 		if verbose {
 			log.SetLevel(log.DebugLevel)
@@ -44,7 +44,7 @@ func init() {
 }
 
 var rootCmd = &cobra.Command{
-	Use: "borderctl",
+	Use: "vertexctl",
 }
 
 var createCmd = &cobra.Command{
@@ -52,7 +52,7 @@ var createCmd = &cobra.Command{
 	Short: "create a new license",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) != 3 {
-			log.Fatal("Usage: borderctl create [filter] [expire] [name]")
+			log.Fatal("Usage: vertexctl create [filter] [expire] [name]")
 		}
 
 		resp := req("/rules", http.MethodPost, map[string]string{"filter": args[0], "expire": args[1], "name": args[2]})
@@ -102,7 +102,7 @@ var deleteCmd = &cobra.Command{
 	Short: "delete a rule",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) != 1 {
-			log.Fatal("Usage: borderctl delete [id]")
+			log.Fatal("Usage: vertexctl delete [id]")
 		}
 
 		resp := req("/rules/"+args[0], http.MethodDelete, nil)
@@ -120,7 +120,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "show version information",
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Infof("borderctl version %s server %s", version, server)
+		log.Infof("vertexctl version %s server %s", version, server)
 	},
 }
 

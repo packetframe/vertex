@@ -1,4 +1,4 @@
-module github.com/packetframe/bdrdrop
+module github.com/packetframe/vertex
 
 go 1.17
 

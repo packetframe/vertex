@@ -1,7 +1,9 @@
 package config
 
 import (
+	"errors"
 	"fmt"
+	"net"
 	"reflect"
 	"strings"
 )
@@ -82,6 +84,27 @@ func (f *Filter) String() string {
 	return s + "}"
 }
 
+// Validate returns an error if the filter is invalid
+func (f *Filter) Validate() error {
+	if f.SrcIP != nil && net.ParseIP(*f.SrcIP) == nil {
+		return fmt.Errorf("invalid source IP address: %s", *f.SrcIP)
+	}
+
+	if f.DstIP != nil && net.ParseIP(*f.DstIP) == nil {
+		return fmt.Errorf("invalid destination IP address: %s", *f.DstIP)
+	}
+
+	if f.SrcIP6 != nil && net.ParseIP(*f.SrcIP6) == nil {
+		return fmt.Errorf("invalid source IPv6 address: %s", *f.SrcIP6)
+	}
+
+	if f.DstIP6 != nil && net.ParseIP(*f.DstIP6) == nil {
+		return fmt.Errorf("invalid destination IPv6 address: %s", *f.DstIP6)
+	}
+
+	return nil
+}
+
 type Config struct {
 	Interface  string    `json:"interface"` // Interface to use for the XDP program
 	UpdateTime int       `json:"update_time"`
@@ -109,4 +132,23 @@ filters = (
 	}
 
 	return s + ");\n"
+}
+
+// Validate checks that the config is valid
+func (c *Config) Validate() error {
+	if c.Interface == "" {
+		return errors.New("interface must be set")
+	}
+
+	if c.UpdateTime < 1 {
+		return errors.New("update_time must be greater than 0")
+	}
+
+	for i := 0; i < len(c.Filters); i++ {
+		if err := c.Filters[i].Validate(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

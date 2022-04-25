@@ -52,7 +52,7 @@ func TestPolicyConfigJSON(t *testing.T) {
 	  "bytes_per_second": 100,
 	  "blocktime": 1,
 	  "tos": 0,
-	  "srcip": "23"
+	  "srcip": "192.0.2.1"
 	},
 	{
 	  "action": 1,
@@ -60,7 +60,7 @@ func TestPolicyConfigJSON(t *testing.T) {
 	  "bps": 100,
 	  "blocktime": 1,
 	  "tos": 0,
-	  "srcip": "23"
+	  "srcip": "192.0.2.1"
 	}
   ]
 }
@@ -79,7 +79,7 @@ filters = (
     pps = 10,
     blocktime = 1,
     tos = 0,
-    srcip = "23",
+    srcip = "192.0.2.1",
   },
   {
     action = 1,
@@ -87,7 +87,7 @@ filters = (
     bps = 100,
     blocktime = 1,
     tos = 0,
-    srcip = "23",
+    srcip = "192.0.2.1",
   }
 );
 `

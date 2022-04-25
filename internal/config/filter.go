@@ -1,27 +1,19 @@
 package config
 
 import (
-	"errors"
+	"encoding/json"
 	"fmt"
 	"net"
 	"reflect"
-	"strings"
-)
-
-const (
-	ActionDeny  = 0
-	ActionAllow = 1
 )
 
 // Filter represents a xdpfw filter policy
 type Filter struct {
-	Enabled          *bool `json:"enabled"`   // Should this rule be enabled?
-	Action           *int  `json:"action"`    // Should the packet be allowed or blocked
-	MinLen           *int  `json:"min_len"`   // Minimum frame length (ethernet header, IP header, L4 header, and data)
-	MaxLen           *int  `json:"max_len"`   // Maximum frame length (ethernet header, IP header, L4 header, and data)
-	PacketsPerSecond *int  `json:"pps"`       // Packets per second that a source IP can send before matching
-	BytesPerSecond   *int  `json:"bps"`       // Bytes per second that a source IP can send before matching
-	BlockTime        *int  `json:"blocktime"` // Time in seconds to block the source IP if the rule matches and the action is block (0). Default value is 1.
+	MinLen           *int `json:"min_len"`   // Minimum frame length (ethernet header, IP header, L4 header, and data)
+	MaxLen           *int `json:"max_len"`   // Maximum frame length (ethernet header, IP header, L4 header, and data)
+	PacketsPerSecond *int `json:"pps"`       // Packets per second that a source IP can send before matching
+	BytesPerSecond   *int `json:"bps"`       // Bytes per second that a source IP can send before matching
+	BlockTime        *int `json:"blocktime"` // Time in seconds to block the source IP if the rule matches and the action is block (0). Default value is 1.
 
 	// IP options
 	TypeOfService *int    `json:"tos"`     // IP TOS field
@@ -56,7 +48,10 @@ type Filter struct {
 
 // String returns a string representation of the filter in xdpfw syntax
 func (f *Filter) String() string {
-	s := "{\n"
+	s := `{
+  enabled = true,
+  action = 0,
+`
 
 	v := reflect.ValueOf(f).Elem()
 	vT := v.Type()
@@ -105,50 +100,12 @@ func (f *Filter) Validate() error {
 	return nil
 }
 
-type Config struct {
-	Interface  string    `json:"interface"` // Interface to use for the XDP program
-	UpdateTime int       `json:"update_time"`
-	Filters    []*Filter `json:"filters"`
-}
-
-// String converts a Config into a xdpfw config file
-func (c *Config) String() string {
-	s := fmt.Sprintf(`interface = "%s";
-updatetime = %d;
-
-filters = (
-`, c.Interface, c.UpdateTime)
-
-	for i := 0; i < len(c.Filters); i++ {
-		filterStr := c.Filters[i].String()
-		filterStr = strings.ReplaceAll(filterStr, "\n", "\n  ")
-		filterStr = strings.ReplaceAll(filterStr, "{", "  {")
-
-		s += filterStr
-		if i != len(c.Filters)-1 {
-			s += ","
-		}
-		s += "\n"
+// FromJSON converts a JSON string into a filter
+func FromJSON(s string) (*Filter, error) {
+	var f Filter
+	if err := json.Unmarshal([]byte(s), &f); err != nil {
+		return nil, err
 	}
 
-	return s + ");\n"
-}
-
-// Validate checks that the config is valid
-func (c *Config) Validate() error {
-	if c.Interface == "" {
-		return errors.New("interface must be set")
-	}
-
-	if c.UpdateTime < 1 {
-		return errors.New("update_time must be greater than 0")
-	}
-
-	for i := 0; i < len(c.Filters); i++ {
-		if err := c.Filters[i].Validate(); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return &f, nil
 }

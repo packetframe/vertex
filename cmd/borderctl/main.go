@@ -13,7 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"github.com/packetframe/bdrdrop/internal/db"
+	"github.com/packetframe/vertex/internal/db"
 )
 
 // Set by build process

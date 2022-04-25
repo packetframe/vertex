@@ -11,8 +11,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/packetframe/bdrdrop/internal/config"
-	"github.com/packetframe/bdrdrop/internal/db"
+	"github.com/packetframe/vertex/internal/config"
+	"github.com/packetframe/vertex/internal/db"
 )
 
 var version = "dev"

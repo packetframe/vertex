@@ -22,20 +22,6 @@ changelog:
       - "^docs:"
       - "^test:"
 
-nfpms:
-  - id: vertexctl
-    package_name: vertexctl
-    file_name_template: "vertexctl_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    vendor: Packetframe
-    homepage: https://github.com/packetframe/api
-    maintainer: Nate Sales <nate@packetframe.com>
-    description: Packetframe vertex edge firewall controller
-    license: GNU GPL-3.0
-    section: utils
-    priority: extra
-    formats:
-      - deb
-
 dockers:
   - ids: [ "api", "vertexctl" ]
     image_templates: [ "ghcr.io/packetframe/vertex:{{ .Version }}" ]

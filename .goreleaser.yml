@@ -25,7 +25,7 @@ changelog:
 nfpms:
   - id: vertexctl
     package_name: vertexctl
-    file_name_template: "edged_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    file_name_template: "vertexctl_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     vendor: Packetframe
     homepage: https://github.com/packetframe/api
     maintainer: Nate Sales <nate@packetframe.com>
@@ -37,7 +37,7 @@ nfpms:
       - deb
 
 dockers:
-  - ids: [ "api" ]
+  - ids: [ "api", "vertexctl" ]
     image_templates: [ "ghcr.io/packetframe/vertex:{{ .Version }}" ]
     dockerfile: Dockerfile
     use: buildx

@@ -9,6 +9,9 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	"github.com/gofiber/fiber/v2"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/packetframe/vertex/internal/config"
@@ -20,6 +23,13 @@ var version = "dev"
 var (
 	dbDsn     = os.Getenv("DB_DSN")
 	sentryDsn = os.Getenv("SENTRY_DSN")
+)
+
+var (
+	metricRules = promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "packetframe_vertex_rules",
+		Help: "Total vertex rules accounts",
+	})
 )
 
 // response returns a JSON response
@@ -77,6 +87,8 @@ func main() {
 			if err := database.Find(&rules).Error; err != nil {
 				log.Warnf("unable to retreive rules: %s", err)
 			}
+
+			metricRules.Set(float64(len(rules)))
 
 			for _, rule := range rules {
 				if time.Since(rule.CreatedAt) > rule.Expire {
@@ -170,7 +182,12 @@ func main() {
 		return c.Status(http.StatusOK).SendString(cfg.String())
 	})
 
-	// go metrics.Listen(metricsListen)
+	// Start metrics server
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		log.Info("Starting metrics exporter on http://:8081/metrics")
+		log.Fatal(http.ListenAndServe(":8081", nil))
+	}()
 
 	startupMessage := fmt.Sprintf("Starting API %s on :8080", version)
 	sentry.CaptureMessage(startupMessage)

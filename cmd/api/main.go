@@ -109,11 +109,16 @@ func main() {
 			return response(c, http.StatusUnprocessableEntity, "Invalid request", nil)
 		}
 		r.ID = ""
-		d, err := time.ParseDuration(r.ExpireStr)
-		if err != nil {
-			return response(c, http.StatusUnprocessableEntity, "Invalid expire duration: "+err.Error(), nil)
+
+		if r.ExpireStr != "never" {
+			d, err := time.ParseDuration(r.ExpireStr)
+			if err != nil {
+				return response(c, http.StatusUnprocessableEntity, "Invalid expire duration: "+err.Error(), nil)
+			}
+			r.Expire = d
+		} else {
+			r.Expire = time.Hour * 24 * 365 * 200 // 200 years
 		}
-		r.Expire = d
 
 		_, err = config.FromJSON(r.Filter)
 		if err != nil {
@@ -139,7 +144,11 @@ func main() {
 		log.Debugf("Retreived %+v", rules)
 
 		for i := range rules {
-			rules[i].ExpireStr = rules[i].Expire.String()
+			expire := rules[i].Expire.String()
+			if expire == "1752000h0m0s" {
+				expire = "never"
+			}
+			rules[i].ExpireStr = expire
 			log.Debugf("Set expireStr to %s", rules[i].ExpireStr)
 		}
 

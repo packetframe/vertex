@@ -7,7 +7,7 @@ XDP based edge firewall
 ##### Ratelimit SYN to 10 pps
 
 ```json
-{"pps": 10, "tcp_syn": true}
+{"tcp_enabled": true, "tcp_syn": true, "pps": 10}
 ```
 
 ##### Ratelimit IP to 1 kbps
